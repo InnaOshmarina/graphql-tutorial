@@ -1,57 +1,68 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 
-import Fab from '@material-ui/core/Fab';
+import { Fab, withStyles } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 
 import DirectorsTable from '../DirectorsTable/DirectorsTable';
 import DirectorsForm from '../DirectorsForm/DirectorsForm';
 
-import withHocs from './DirectorsHoc';
+import { styles } from './styles';
 
-class Directors extends React.Component {
-  state = {
-    open: false,
-    name: '',
-    age: 0,
-  };
+const INITIAL_STATE = {
+  open: false,
+  name: '',
+  age: 0,
+};
 
-  handleClickOpen = data => {
-    this.setState({
-      open: true,
-      ...data,
-    });
-  };
+const Directors = props => {
+  const { classes } = props;
+  const [director, setDirector] = useState({ ...INITIAL_STATE });
 
-  handleClose = () => this.setState({ name: '', age: 0, id: null, open: false });
+  const { name, age, id, open } = director;
 
-  handleChange = name => ({ target }) => this.setState({ [name]: target.value });
+  const handleClickOpen = useCallback(
+    data => {
+      setDirector({
+        ...INITIAL_STATE,
+        open: true,
+        ...data,
+      });
+    },
+    [setDirector],
+  );
 
-  render() {
-    const { name, age, id, open } = this.state;
-    const { classes } = this.props;
+  const handleClose = useCallback(() => {
+    setDirector({ ...INITIAL_STATE, id: null });
+  }, [setDirector]);
 
-    return (
-      <>
-        <DirectorsForm
-          handleChange={this.handleChange}
-          selectedValue={{ name, age, id }}
-          open={open}
-          onClose={this.handleClose}
-        />
-        <div className={classes.wrapper}>
-          <DirectorsTable onOpen={this.handleClickOpen} onClose={this.handleClose} />
-          <Fab
-            onClick={() => this.handleClickOpen(null)}
-            color="primary"
-            aria-label="Add"
-            className={classes.fab}
-          >
-            <AddIcon />
-          </Fab>
-        </div>
-      </>
-    );
-  }
-}
+  const handleChange = useCallback(
+    ({ target }) => {
+      setDirector({ ...director, [target.name]: target.value });
+    },
+    [setDirector, director],
+  );
 
-export default withHocs(Directors);
+  return (
+    <>
+      <DirectorsForm
+        handleChange={handleChange}
+        selectedValue={{ name, age, id }}
+        open={open}
+        onClose={handleClose}
+      />
+      <div className={classes.wrapper}>
+        <DirectorsTable onOpen={handleClickOpen} onClose={handleClose} />
+        <Fab
+          onClick={() => handleClickOpen(null)}
+          color="primary"
+          aria-label="Add"
+          className={classes.fab}
+        >
+          <AddIcon />
+        </Fab>
+      </div>
+    </>
+  );
+};
+
+export default withStyles(styles)(Directors);

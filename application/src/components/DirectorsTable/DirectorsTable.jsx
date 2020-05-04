@@ -60,8 +60,6 @@ const DirectorsTable = props => {
 
   const { classes } = props;
 
-  console.log('data: ', data);
-
   return (
     <>
       <DirectorsDialog open={openDialog} handleClose={handleDialogClose} id={activeElem.id} />

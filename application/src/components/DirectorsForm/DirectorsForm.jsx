@@ -1,67 +1,77 @@
-import React from 'react';
-import TextField from '@material-ui/core/TextField';
-import Button from '@material-ui/core/Button';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Dialog from '@material-ui/core/Dialog';
+import React, { useCallback } from 'react';
+import { useMutation } from 'react-apollo';
+import { TextField, Button, DialogTitle, Dialog, withStyles } from '@material-ui/core';
 import SaveIcon from '@material-ui/icons/Save';
 
-import withHocs from './DirectorsFormHoc';
+import { addDirectorMutation, updateDirectorMutation } from './mutations';
+import { directorsQuery } from '../DirectorsTable/queries';
 
-class DirectorsForm extends React.Component {
-  handleClose = () => {
-    this.props.onClose();
-  };
+import { styles } from './styles';
 
-  handleSave = () => {
-    const { selectedValue, onClose, addDirector } = this.props;
-    const { name, age } = selectedValue;
-    addDirector({name, age: Number(age)})
-    onClose();
-  };
+const DirectorsForm = props => {
+  const { classes, open, handleChange, selectedValue = {}, onClose } = props;
+  const { id, name, age } = selectedValue;
 
-  render() {
-    const { classes, open, handleChange, selectedValue = {} } = this.props;
-    const { name, age } = selectedValue;
+  const [addDirector] = useMutation(addDirectorMutation);
+  const [updateDirector] = useMutation(updateDirectorMutation);
 
-    return (
-      <Dialog onClose={this.handleClose} open={open} aria-labelledby="simple-dialog-title">
-        <DialogTitle className={classes.title} id="simple-dialog-title">
-          Director information
-        </DialogTitle>
-        <form className={classes.container} noValidate autoComplete="off">
-          <TextField
-            id="outlined-name"
-            label="Name"
-            className={classes.textField}
-            value={name}
-            onChange={handleChange('name')}
-            margin="normal"
-            variant="outlined"
-          />
-          <TextField
-            id="outlined-rate"
-            label="Age"
-            className={classes.textField}
-            value={age}
-            onChange={handleChange('age')}
-            type="number"
-            margin="normal"
-            variant="outlined"
-          />
-          <div className={classes.wrapper}>
-            <Button
-              onClick={this.handleSave}
-              variant="contained"
-              color="primary"
-              className={classes.button}
-            >
-              <SaveIcon /> Save
-            </Button>
-          </div>
-        </form>
-      </Dialog>
-    );
-  }
-}
+  const handleSave = useCallback(async () => {
+    try {
+      id
+        ? await updateDirector({
+            variables: { id, name, age: Number(age) },
+            refetchQueries: [{ query: directorsQuery }],
+          })
+        : await addDirector({
+            variables: { name, age: Number(age) },
+            refetchQueries: [{ query: directorsQuery }],
+          });
+      onClose();
+    } catch (error) {
+      console.log(error);
+    }
+  }, [id, name, age, updateDirector, addDirector, onClose]);
 
-export default withHocs(DirectorsForm);
+  return (
+    <Dialog onClose={onClose} open={open} aria-labelledby="simple-dialog-title">
+      <DialogTitle className={classes.title} id="simple-dialog-title">
+        Director information
+      </DialogTitle>
+      <form className={classes.container} noValidate autoComplete="off">
+        <TextField
+          id="outlined-name"
+          label="Name"
+          className={classes.textField}
+          value={name}
+          onChange={handleChange}
+          margin="normal"
+          variant="outlined"
+          name="name"
+        />
+        <TextField
+          id="outlined-rate"
+          label="Age"
+          className={classes.textField}
+          value={age}
+          onChange={e => handleChange(e)}
+          type="number"
+          margin="normal"
+          variant="outlined"
+          name="age"
+        />
+        <div className={classes.wrapper}>
+          <Button
+            onClick={handleSave}
+            variant="contained"
+            color="primary"
+            className={classes.button}
+          >
+            <SaveIcon /> Save
+          </Button>
+        </div>
+      </form>
+    </Dialog>
+  );
+};
+
+export default withStyles(styles)(DirectorsForm);

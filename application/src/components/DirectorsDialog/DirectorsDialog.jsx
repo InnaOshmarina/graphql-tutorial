@@ -1,4 +1,5 @@
-import React, { memo } from 'react';
+import React, { memo, useCallback } from 'react';
+import { useMutation } from 'react-apollo';
 import {
   Button,
   Dialog,
@@ -10,15 +11,25 @@ import {
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import BlockIcon from '@material-ui/icons/Block';
 
-import withHocs from './DirectorsDialogHoc';
+import { deleteDirectorMutation } from './mutations';
+import { directorsQuery } from '../DirectorsTable/queries';
 
 const DirectorsDialog = props => {
-  const handleDelete = () => {
-    const { id, handleClose, deleteDirector } = props;
-    deleteDirector(id);
-    handleClose();
-  };
-  const { open, handleClose } = props;
+  const { id, open, handleClose } = props;
+  const [deleteDirector] = useMutation(deleteDirectorMutation);
+
+  const handleDelete = useCallback(async () => {
+    try {
+      await deleteDirector({
+        variables: { id },
+        refetchQueries: [{ query: directorsQuery }],
+      });
+      handleClose();
+    } catch (error) {
+      console.log(error);
+    }
+  }, [id, deleteDirector, handleClose]);
+
   return (
     <Dialog
       open={open}
@@ -46,4 +57,4 @@ const DirectorsDialog = props => {
   );
 };
 
-export default memo(withHocs(DirectorsDialog));
+export default memo(DirectorsDialog);

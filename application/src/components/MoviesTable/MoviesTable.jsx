@@ -56,8 +56,6 @@ class MoviesTable extends React.Component {
 
     const { classes, data = {} } = this.props;
 
-    console.log('dataMovies: ', data);
-
     const { movies = [] } = data;
 
     return (
@@ -76,7 +74,7 @@ class MoviesTable extends React.Component {
               </TableRow>
             </TableHead>
             <TableBody>
-              {movies.map((movie) => {
+              {movies.map(movie => {
                 return (
                   <TableRow key={movie.id}>
                     <TableCell component="th" scope="row">
@@ -90,7 +88,7 @@ class MoviesTable extends React.Component {
                     </TableCell>
                     <TableCell align="right">
                       <>
-                        <IconButton color="inherit" onClick={(e) => this.handleClick(e, movie)}>
+                        <IconButton color="inherit" onClick={e => this.handleClick(e, movie)}>
                           <MoreIcon />
                         </IconButton>
                         <Menu
