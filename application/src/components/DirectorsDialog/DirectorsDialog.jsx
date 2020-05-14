@@ -22,7 +22,7 @@ const DirectorsDialog = props => {
     try {
       await deleteDirector({
         variables: { id },
-        refetchQueries: [{ query: directorsQuery }],
+        refetchQueries: [{ query: directorsQuery, variables: { name: '' } }],
       });
       handleClose();
     } catch (error) {

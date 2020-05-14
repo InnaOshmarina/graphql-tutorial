@@ -1,29 +1,45 @@
-import React from 'react';
-import InputBase from '@material-ui/core/InputBase';
+import React, { useCallback, useEffect, useState } from 'react';
+import { InputBase, withStyles } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 
-import withHocs from './DirectorsSearchHoc';
+import { styles } from './styles';
 
-class DirectorsSearch extends React.Component {
+const DirectorsSearch = props => {
+  const { classes, fetchMore } = props;
+  const [search, setSearch] = useState('');
 
-  render() {
-    const { classes } = this.props;
+  useEffect(() => {
+    fetchMore({
+      variables: { name: search },
+      updateQuery: (previousResult, { fetchMoreResult }) => fetchMoreResult,
+    });
+  }, [fetchMore, search]);
 
-    return (
-      <div className={classes.search}>
-        <div className={classes.searchIcon}>
-          <SearchIcon />
-        </div>
-        <InputBase
-          placeholder="Search…"
-          classes={{
-            root: classes.inputRoot,
-            input: classes.inputInput,
-          }}
-        />
+  const onSearch = useCallback(
+    ({ target }) => {
+      setSearch(target.value);
+    },
+
+    [],
+  );
+
+  return (
+    <div className={classes.search}>
+      <div className={classes.searchIcon}>
+        <SearchIcon />
       </div>
-    );
-  }
+      <InputBase
+        placeholder="Search…"
+        classes={{
+          root: classes.inputRoot,
+          input: classes.inputInput,
+        }}
+        onChange={onSearch}
+        name="name"
+        value={search}
+      />
+    </div>
+  );
 };
 
-export default withHocs(DirectorsSearch);
+export default withStyles(styles)(DirectorsSearch);

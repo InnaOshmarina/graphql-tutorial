@@ -1,4 +1,4 @@
-import React, { useState, memo } from 'react';
+import React, { useState, memo, useCallback } from 'react';
 import { useQuery } from 'react-apollo';
 import {
   Paper,
@@ -16,6 +16,7 @@ import MoreIcon from '@material-ui/icons/MoreVert';
 import DeleteIcon from '@material-ui/icons/Delete';
 import CreateIcon from '@material-ui/icons/Create';
 
+import DirectorsSearch from '../DirectorsSearch/DirectorsSearch';
 import DirectorsDialog from '../DirectorsDialog/DirectorsDialog';
 
 import { directorsQuery } from './queries';
@@ -23,45 +24,44 @@ import { directorsQuery } from './queries';
 import { styles } from './styles';
 
 const DirectorsTable = props => {
+  const { classes, onOpen } = props;
+
   const [anchorEl, setAnchorEl] = useState(null);
 
   const [openDialog, setOpenDialog] = useState(false);
 
   const [activeElem, setActiveElem] = useState({});
 
-  const { loading, data } = useQuery(directorsQuery);
+  const { loading, data, fetchMore } = useQuery(directorsQuery, {
+    variables: { name: '' },
+  });
 
-  const handleDialogOpen = () => {
-    setOpenDialog(true);
-  };
-  const handleDialogClose = () => {
-    setOpenDialog(false);
-  };
+  const handleDialogOpen = useCallback(() => setOpenDialog(true), []);
 
-  const handleClick = ({ currentTarget }, data) => {
+  const handleDialogClose = useCallback(() => setOpenDialog(false), []);
+
+  const handleClick = useCallback(({ currentTarget }, data) => {
     setAnchorEl(currentTarget);
     setActiveElem(data);
-  };
+  }, []);
 
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  const handleClose = useCallback(() => setAnchorEl(null), []);
 
-  const handleEdit = row => {
-    const { onOpen } = props;
+  const handleEdit = useCallback(() => {
     onOpen(activeElem);
     handleClose();
-  };
+  }, [onOpen, handleClose, activeElem]);
 
-  const handleDelete = () => {
+  const handleDelete = useCallback(() => {
     handleDialogOpen();
     handleClose();
-  };
-
-  const { classes } = props;
+  }, [handleDialogOpen, handleClose]);
 
   return (
     <>
+      <Paper>
+        <DirectorsSearch fetchMore={fetchMore} />
+      </Paper>
       <DirectorsDialog open={openDialog} handleClose={handleDialogClose} id={activeElem.id} />
       <Paper className={classes.root}>
         <Table>
@@ -84,7 +84,7 @@ const DirectorsTable = props => {
                     <TableCell align="right">{director.age}</TableCell>
                     <TableCell>
                       {director.movies.map((movie, key) => (
-                        <div key={movie.name}>
+                        <div key={movie.id}>
                           {`${key + 1}. `}
                           {movie.name}
                         </div>

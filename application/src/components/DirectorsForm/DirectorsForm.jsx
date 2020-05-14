@@ -20,11 +20,11 @@ const DirectorsForm = props => {
       id
         ? await updateDirector({
             variables: { id, name, age: Number(age) },
-            refetchQueries: [{ query: directorsQuery }],
+            refetchQueries: [{ query: directorsQuery, variables: { name: '' } }],
           })
         : await addDirector({
             variables: { name, age: Number(age) },
-            refetchQueries: [{ query: directorsQuery }],
+            refetchQueries: [{ query: directorsQuery, variables: { name: '' } }],
           });
       onClose();
     } catch (error) {

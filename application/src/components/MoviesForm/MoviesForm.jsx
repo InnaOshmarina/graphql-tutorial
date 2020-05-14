@@ -21,8 +21,8 @@ class MoviesForm extends React.Component {
 
   handleSave = () => {
     const { selectedValue, onClose, addMovie } = this.props;
-    const { name, genre, rate, directorId, watched } = selectedValue;
-    addMovie({ name, genre, rate: Number(rate), directorId, watched: Boolean(watched) });
+    const { nameD, genre, rate, directorId, watched } = selectedValue;
+    addMovie({ nameD, genre, rate: Number(rate), directorId, watched: Boolean(watched) });
     onClose();
   };
 
@@ -37,7 +37,7 @@ class MoviesForm extends React.Component {
       data = {},
     } = this.props;
 
-    const { name, genre, rate, directorId, watched } = selectedValue;
+    const { nameD, genre, rate, directorId, watched } = selectedValue;
 
     const { directors = [] } = data;
 
@@ -48,11 +48,11 @@ class MoviesForm extends React.Component {
         </DialogTitle>
         <form className={classes.container} noValidate autoComplete="off">
           <TextField
-            id="outlined-name"
+            id="outlined-nameD"
             label="Name"
             className={classes.textField}
-            value={name}
-            onChange={handleChange('name')}
+            value={nameD}
+            onChange={handleChange('nameD')}
             margin="normal"
             variant="outlined"
           />
@@ -87,11 +87,11 @@ class MoviesForm extends React.Component {
             <Select
               value={directorId}
               onChange={handleSelectChange}
-              input={<OutlinedInput name="directorId" id="outlined-director" labelWidth={57} />}
+              input={<OutlinedInput nameD="directorId" id="outlined-director" labelWidth={57} />}
             >
               {directors.map(director => (
                 <MenuItem key={director.id} value={director.id}>
-                  {director.name}
+                  {director.nameD}
                 </MenuItem>
               ))}
             </Select>

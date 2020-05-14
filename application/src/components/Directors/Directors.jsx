@@ -20,26 +20,23 @@ const Directors = props => {
 
   const { name, age, id, open } = director;
 
-  const handleClickOpen = useCallback(
-    data => {
-      setDirector({
-        ...INITIAL_STATE,
-        open: true,
-        ...data,
-      });
-    },
-    [setDirector],
-  );
+  const handleClickOpen = useCallback(data => {
+    setDirector({
+      ...INITIAL_STATE,
+      open: true,
+      ...data,
+    });
+  }, []);
 
   const handleClose = useCallback(() => {
     setDirector({ ...INITIAL_STATE, id: null });
-  }, [setDirector]);
+  }, []);
 
   const handleChange = useCallback(
     ({ target }) => {
       setDirector({ ...director, [target.name]: target.value });
     },
-    [setDirector, director],
+    [director],
   );
 
   return (
